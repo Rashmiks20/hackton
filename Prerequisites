@@ -1,0 +1,24 @@
+Before coding, set up your Azure services:
+
+Azure Setup
+Create a Resource Group
+
+bash
+az group create --name HealthAssistantGroup --location eastus
+Set Up Azure Cognitive Services (LUIS)
+
+bash
+az cognitiveservices account create \
+  --name HealthAssistantLUIS \
+  --resource-group HealthAssistantGroup \
+  --kind LUIS \
+  --sku F0 \
+  --location eastus
+Create Azure Cosmos DB
+
+bash
+az cosmosdb create --name HealthAssistantDB --resource-group HealthAssistantGroup --kind MongoDB
+Deploy API Gateway
+
+bash
+az apim create --name HealthAPIManagement --resource-group HealthAssistantGroup --location eastus --sku-name Consumption
