@@ -1,0 +1,61 @@
+Install dependencies
+
+bash
+pip install fastapi uvicorn azure-functions python-dotenv pymongo requests
+
+Backend Code (FastAPI)
+Create main.py:
+python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import requests
+import os
+import pymongo
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+app = FastAPI()
+
+# MongoDB Setup (Azure Cosmos DB)
+MONGO_URL = os.getenv("MONGO_URL")
+client = pymongo.MongoClient(MONGO_URL)
+db = client["health_assistant"]
+users_collection = db["users"]
+
+# Define Request Model
+class UserRequest(BaseModel):
+    user_id: str
+    symptom: str
+
+# LUIS API Call
+def get_health_advice(symptom):
+    LUIS_ENDPOINT = os.getenv("LUIS_ENDPOINT")
+    response = requests.get(f"{LUIS_ENDPOINT}?query={symptom}")
+    return response.json()
+
+@app.post("/check_symptom/")
+async def check_symptom(data: UserRequest):
+    advice = get_health_advice(data.symptom)
+    return {"user": data.user_id, "advice": advice}
+Deploy to Azure Functions
+
+Create Function App
+bash
+az functionapp create --resource-group HealthAssistantGroup --consumption-plan-location eastus --runtime python --functions-version 4 --name HealthAssistantFunc --storage-account mystorageaccount
+
+Deploy
+bash
+func azure functionapp publish HealthAssistantFunc
+
+API Gateway (Azure API Management)
+After deploying the backend, configure Azure API Management to expose it securely.
+
+Create an API in Azure API Management
+bash
+az apim api create --service-name HealthAPIManagement --name health-api --path /health --api-type http
+
+Add Backend Service
+bash
+az apim api operation create --service-name HealthAPIManagement --api-name health-api --name get-health-advice --method POST --url-template "/check_symptom"
