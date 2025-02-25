@@ -1,0 +1,11 @@
+Use Case: Notify Users via Email
+Create a Logic App
+
+bash
+az logicapp create --resource-group HealthAssistantGroup --name HealthAssistantLogicApp --location eastus
+Create an Automated Workflow
+
+Use Azure Portal > Logic Apps.
+Select "When an HTTP request is received".
+Configure it to call the Azure Function.
+Use "Send an email (Outlook 365)" to notify users.
