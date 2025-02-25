@@ -1,0 +1,50 @@
+Setup React App
+bash
+npx create-react-app health-assistant-ui
+cd health-assistant-ui
+npm install axios
+
+React Frontend Code
+Edit App.js:
+
+jsx
+import React, { useState } from "react";
+import axios from "axios";
+
+const API_URL = "https://your-api-gateway.azure-api.net/health/check_symptom/";
+
+function App() {
+  const [symptom, setSymptom] = useState("");
+  const [response, setResponse] = useState("");
+
+  const checkSymptom = async () => {
+    try {
+      const res = await axios.post(API_URL, { user_id: "123", symptom });
+      setResponse(res.data.advice);
+    } catch (error) {
+      console.error("Error:", error);
+      setResponse("Failed to fetch health advice.");
+    }
+  };
+
+  return (
+    <div>
+      <h1>AI Health Assistant</h1>
+      <input
+        type="text"
+        placeholder="Enter symptom"
+        value={symptom}
+        onChange={(e) => setSymptom(e.target.value)}
+      />
+      <button onClick={checkSymptom}>Check</button>
+      <p>{response}</p>
+    </div>
+  );
+}
+
+export default App;
+Deploy Frontend to Azure Web App
+bash
+
+az webapp create --resource-group HealthAssistantGroup --plan FreePlan --name HealthAssistantUI --runtime "NODE|18-lts"
+az webapp deployment source config --name HealthAssistantUI --resource-group HealthAssistantGroup --repo-url "https://github.com/yourrepo" --branch main
