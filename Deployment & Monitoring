@@ -1,0 +1,8 @@
+Monitor via Azure Application Insights:
+
+bash
+az monitor app-insights component create --app HealthAssistantInsights --location eastus --resource-group HealthAssistantGroup
+Enable Logging in Functions:
+
+bash
+az functionapp log tail --name HealthAssistantFunc --resource-group HealthAssistantGroup
